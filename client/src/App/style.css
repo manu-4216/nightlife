@@ -4,8 +4,10 @@
 
 .App-header {
     color: white;
-    background: black;
+    background: #270f13;
+    background: linear-gradient(135deg, #191212, #262525);
     text-align: left;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.71);
 }
 
 .App-logo {

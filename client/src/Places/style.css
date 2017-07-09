@@ -1,8 +1,75 @@
+.Places {
+    margin: 2em 0;
+    padding: 0;
+    max-width: 35em;
+}
 .Places li {
     list-style: none;
+    margin: 1em;
+    padding: 0;
+    display: flex;
+    background: #dedede;
+    border-radius: 3px;
 }
 
-.Places-empty {
-    padding: 1em;
-    font-size: 70%;
+
+.Places-image {
+    width: 10em;
+    height: 10em;
+    background: black;
+    background: linear-gradient(135deg, #221b1b, #3c2b2d);
+    box-shadow: 2px 0 5px 0 rgba(0, 0, 0, 0.71);
+    object-fit: cover;
+}
+
+.Places-info-right {
+    font-size: 90%;
+    color: black;
+    padding: 0.5em 0.8em;
+    text-align: left;
+}
+
+.Places-info-right a {
+    text-decoration: none;
+    color: #1e96ff;
+}
+
+.Places-info-right a:visited {
+    color: #2683bb;
+}
+
+.Places-info-right a:hover {
+    color: #FF9800;
+}
+
+.Places-rating {
+    font-size: 90%;
+    margin-left: 0.6em;
+}
+
+.Places-star {
+    color: #FF9800;
+    font-size: 110%;
+}
+
+.Places-title {
+    padding: 0;
+    font-size: 130%;
+}
+
+.Places-phone a, .Places-address a {
+    padding-left: 0.6em;
+}
+
+.Places-categories {
+    line-height: 1.5em;
+    margin-bottom: 1em;
+    font-size: 80%;
+}
+
+.Places-categories span span {
+    padding: 0.1em 0.7em;
+    background: #ffcd3b;
+    margin-right: 0.5em;
+    border-radius: 0.2em;
 }

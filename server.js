@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "production") {
 
 // Make server call to YELP API to get the 'nightlife' places around a place
 app.get('/api/search', function (req, res) {
-    var location = decodeURIComponent(req.query.location)
+    var location = decodeURIComponent(req.query.location).toLowerCase()
 
     yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
     .then(response => {
@@ -29,7 +29,8 @@ app.get('/api/search', function (req, res) {
 
         return yelp.client(token).search({
             location: location,
-            categories: 'nightlife'
+            //categories: 'nightlife'
+            categories: 'bars'
         })
     })
     .then(response => {
@@ -49,6 +50,7 @@ app.get('/api/search', function (req, res) {
             }
         });
 
+        //console.log('Sample data: ', usefulData[0])
         res.json(usefulData)
 
     })

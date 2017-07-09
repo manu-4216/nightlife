@@ -5,8 +5,8 @@
 }
 
 .Content-intro {
-    font-size: 130%;
-    margin: 1.5em auto;
+    font-size: 110%;
+    margin: 1em auto;
     padding: 0 1em;
 }
 
@@ -17,4 +17,24 @@
 
 .Content-loading {
     padding: 0.6em;
+}
+
+.Content-form {
+
+}
+
+.Content-form input {
+    border: none;
+    outline: none;
+    padding: 0.4em;
+    font-size: 120%;
+}
+
+.Content-form input[type="submit"] {
+    background: #ffcd3b;
+    border-radius: 0 5px 5px 0;
+}
+
+.Content-form input[type="text"] {
+    border-radius: 5px 0 0 5px;
 }

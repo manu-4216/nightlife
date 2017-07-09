@@ -54,10 +54,9 @@ class Content extends Component {
             <div className="Content">
                 <p className="Content-intro">Explore nightife opportunities around you</p>
 
-                <form onSubmit={this.handleSubmit}>
+                <form className="Content-form" onSubmit={this.handleSubmit}>
                     <label>
-                        Location:
-                        <input type="text" name="location" value={this.state.location} onChange={this.handleChange} />
+                        <input type="text" placeholder="Enter your location" autoComplete="off" name="location" value={this.state.location} onChange={this.handleChange} />
                     </label>
                     <input type="submit" value="Search" />
                 </form>
