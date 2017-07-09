@@ -16,8 +16,7 @@
 .Places-image {
     width: 10em;
     height: 10em;
-    background: black;
-    background: linear-gradient(135deg, #221b1b, #3c2b2d);
+    background: #201f1f;
     box-shadow: 2px 0 5px 0 rgba(0, 0, 0, 0.71);
     object-fit: cover;
 }

@@ -52,7 +52,7 @@ class Content extends Component {
     render() {
         return (
             <div className="Content">
-                <p className="Content-intro">Explore nightife opportunities around you</p>
+                <p className="Content-intro">Explore <span className="nightlife">nightlife</span> opportunities around you</p>
 
                 <form className="Content-form" onSubmit={this.handleSubmit}>
                     <label>
