@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
+import logo from '../logo.png';
 import './style.css';
 import Content from '../Content/index';
 
@@ -11,7 +11,7 @@ class App extends Component {
                     <img src={logo} className="App-logo" alt="logo" />
                     <h2 className="App-title">Nightlife </h2>
                 </div>
-                
+
                 <Content />
             </div>
         );

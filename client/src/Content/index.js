@@ -49,15 +49,24 @@ class Content extends Component {
         })
     }
 
+    componentDidMount() {
+        this.searchInput.focus();
+    }
+
     render() {
         return (
             <div className="Content">
                 <p className="Content-intro">Explore <span className="nightlife">nightlife</span> opportunities around you</p>
 
                 <form className="Content-form" onSubmit={this.handleSubmit}>
-                    <label>
-                        <input type="text" placeholder="Enter your location" autoComplete="off" name="location" value={this.state.location} onChange={this.handleChange} />
-                    </label>
+                    <input
+                        type="text"
+                        ref={(input) => { this.searchInput = input; }}
+                        placeholder="Enter your location"
+                        autoComplete="off"
+                        name="location"
+                        value={this.state.location}
+                        onChange={this.handleChange} />
                     <input type="submit" value="Search" />
                 </form>
 

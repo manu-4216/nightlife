@@ -2,6 +2,10 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const yelp = require('yelp-fusion')
+let cachedToken = {
+    value: '',
+    expirationDate: 0
+}
 
 const bodyParser = require('body-parser')
 
@@ -19,14 +23,32 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"))
 }
 
+/**
+ * Caches the token, to speed up the next YELP API calls
+ */
+function getToken() {
+    if (cachedToken.value && cachedToken.expirationDate && Date.now()/1000 < cachedToken.expirationDate) {
+        return Promise.resolve(cachedToken.value)
+    } else {
+        // Get new token:
+        return yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+        .then(response => {
+            cachedToken.value = response.jsonBody.access_token
+            cachedToken.expirationDate = Date.now() + response.jsonBody.expires_in
+            return Promise.resolve(cachedToken.value)
+        })
+        .catch(error => {
+            return Promise.reject(error)
+        })
+    }
+}
+
 // Make server call to YELP API to get the 'nightlife' places around a place
 app.get('/api/search', function (req, res) {
     var location = decodeURIComponent(req.query.location).toLowerCase()
 
-    yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
-    .then(response => {
-        const token = response.jsonBody.access_token;
-
+    getToken()
+    .then(token => {
         return yelp.client(token).search({
             location: location,
             //categories: 'nightlife'

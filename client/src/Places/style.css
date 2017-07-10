@@ -49,6 +49,7 @@
 .Places-star {
     color: #FF9800;
     font-size: 110%;
+    text-shadow: 0 0 1px black;
 }
 
 .Places-title {
