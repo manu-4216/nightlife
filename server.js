@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 require('dotenv').config()
 const yelp = require('yelp-fusion')
-let cachedToken = {
+const cachedToken = {
     value: '',
     expirationDate: 0
 }
@@ -44,7 +44,7 @@ function getToken() {
 }
 
 // Make server call to YELP API to get the 'nightlife' places around a place
-app.get('/api/search', function (req, res) {
+app.get('/search', function (req, res) {
     var location = decodeURIComponent(req.query.location).toLowerCase()
 
     getToken()

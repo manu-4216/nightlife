@@ -36,7 +36,7 @@ const Places = props =>
 
                         <div className="Places-phone">
                             ☎
-                            <a href={place.display_phone} target="_blank">{place.display_phone || '-'}</a>
+                            <a href={place.display_phone || '#'} target="_blank">{place.display_phone || '-'}</a>
                         </div>
                         <div className="Places-address">
                             <img src={location} className="Places-location" alt="" />

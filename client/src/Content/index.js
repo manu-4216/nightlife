@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import './style.css'
 import Places from '../Places/index';
-const axios = require('axios')
+const store =require('store');
+const axios = require('axios');
 
 
 class Content extends Component {
@@ -26,31 +27,26 @@ class Content extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        let url = '/api/search?location=' + encodeURIComponent(this.state.location);
+        const location = encodeURIComponent(this.state.location);
 
-        this.setState({
-            loading: true
-        })
-
-        axios.get(url)
-        .then(response => {
-            this.setState({
-                places: response.data,
-                errorMessage: '',
-                loading: false
-            })
-        })
-        .catch(error => {
-            this.setState({
-                places: [],
-                errorMessage: error.response.data || 'Unknown error',
-                loading: false
-            })
-        })
+        window.history.pushState(location, 'Title', '/search?location=' + location); // updates the URL
+        this.fetchResults('', location);
     }
 
     componentDidMount() {
+        // Detect direct link to a search query. Need to populate with the previous cached results (if any)
+        const query = window.location.search,
+            location = window.location.search.replace("?location=", "");
+
         this.searchInput.focus();
+        
+        if (query && location) {
+            this.fetchResults(query, location);
+        }
+
+        this.setState({
+            location: decodeURIComponent(location)
+        });
     }
 
     render() {
@@ -82,6 +78,57 @@ class Content extends Component {
 
             </div>
         );
+    }
+
+    // Methods for getthings things done
+    //**********************************
+
+    // Fetch the results from cache (if available) or network
+    fetchResults(query, location) {
+        let queryResult = '';
+
+        queryResult = store.get(location);
+        if (queryResult) {
+            this.setState({
+                places: queryResult,
+                errorMessage: '',
+                location: decodeURIComponent(location)
+            });
+        } else {
+            // No cache yet, so do the server fetch
+            this.fetchResultsFromNetwork(location);
+        }
+
+    }
+
+    // Gets the results from the server
+    // Used 1) after a form submition or 2) by direct URL access with a query in the URL
+    fetchResultsFromNetwork(location) {
+        const url = '/search?location=' + location;
+
+        this.setState({
+            loading: true
+        })
+
+        axios.get(url)
+        .then(response => {
+            this.setState({
+                places: response.data,
+                errorMessage: '',
+                loading: false
+            });
+
+            // Cache the result, in localStorage, for later use
+            store.set(location, response.data);
+
+        })
+        .catch(error => {
+            this.setState({
+                places: [],
+                errorMessage: error.response.data || 'Unknown error',
+                loading: false
+            })
+        })
     }
 }
 
