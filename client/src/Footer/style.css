@@ -1,0 +1,13 @@
+.Footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 80%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    color: #c2c3b2;
+}
+
+.Footer-yelp-info {
+    padding: 0.3em;
+}

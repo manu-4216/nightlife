@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import './style.css'
 import stamp from '../stamp.png';
 import location from '../location.svg';
@@ -36,13 +36,15 @@ const Places = props =>
                             </div>
 
                             <div className="Places-phone">
-                                ☎
-                                <a href={place.display_phone || '#'} target="_blank">{place.display_phone || '-'}</a>
+                                <span className="Places-phone-symbol">☎</span>
+                                <a href={'tel:' + place.display_phone || '#'} target="_blank">{place.display_phone || '-'}</a>
                             </div>
 
                             <div className="Places-address">
                                 <img src={location} className="Places-location" alt="" />
-                                <a href={"https://maps.google.com/?q=" + place.address} title="Click to open in Maps" target="_blank">{place.address}</a>
+                                <a href={"https://maps.google.com/?q=" + place.address + ', ' + place.city} title="Click to open in Maps" target="_blank">
+                                    {place.address + ((props.location.toLowerCase() === place.city.toLowerCase()) ? '' : ', ' + place.city)}
+                                </a>
                             </div>
 
                             <div className="Places-actions">
@@ -57,16 +59,12 @@ const Places = props =>
 
                             <ReactCSSTransitionGroup
                                     transitionName="anim"
-                                    transitionAppear={true}
-                                    transitionEnter={true}
-                                    transitionLeave={true}
                                     transitionEnterTimeout={300}
-                                    transitionAppearTimeout={300}
                                     transitionLeaveTimeout={300}>
                                     {place.userIsGoing &&
-                                        <img className="Places-stamp" src={stamp} className="Places-stamp" alt="" />
+                                        <img className="Places-stamp" src={stamp} alt="" />
                                     }
-                        <   /ReactCSSTransitionGroup>
+                            </ReactCSSTransitionGroup>
 
                         </div>
                     </div>

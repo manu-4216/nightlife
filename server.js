@@ -57,8 +57,6 @@ app.get('/search', function (req, res) {
     })
     .then(response => {
         let usefulData = response.jsonBody.businesses.map(place => {
-            // Display the city in the address, if it's different that the input city
-            let cityIfDifferent = (location === place.location.city.toLowerCase()) ? '' : ', ' + place.location.city;
 
             return {
                 id: place.id,
@@ -67,7 +65,8 @@ app.get('/search', function (req, res) {
                 image_url: place.image_url,
                 url: place.url,
                 categories: place.categories,
-                address: place.location.address1 + cityIfDifferent,
+                address: place.location.address1,
+                city: place.location.city,
                 display_phone: place.display_phone
             }
         });

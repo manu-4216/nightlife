@@ -19,33 +19,6 @@ class Content extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        this.setState({
-            location: event.target.value
-        });
-    }
-
-    handleSubmit(event) {
-        event.preventDefault();
-        const location = encodeURIComponent(this.state.location);
-
-        window.history.pushState(location, 'Title', '/search?location=' + location); // updates the URL
-        this.fetchResults('', location);
-    }
-
-    toggleGoing(index) {
-        console.log(this.state.places[index].name);
-
-        const places = this.state.places;
-        places[index].userIsGoing = !places[index].userIsGoing;
-        places[index].goingCount += places[index].userIsGoing ? 1 : -1;
-
-        // update state
-        this.setState({
-            places
-        });
-    }
-
     componentDidMount() {
         // Detect direct link to a search query. Need to populate with the previous cached results (if any)
         const query = window.location.search,
@@ -87,6 +60,7 @@ class Content extends Component {
                     <div className="Content-loading">Loading...</div> :
 
                     <Places
+                        location={this.state.location}
                         places={this.state.places}
                         handleToggleGoing={this.toggleGoing.bind(this)}/>
                 }
@@ -95,7 +69,34 @@ class Content extends Component {
         );
     }
 
-    // Methods for gettings things done
+    // Event handlers
+    //********************************
+    handleChange(event) {
+        this.setState({
+            location: event.target.value
+        });
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        const location = encodeURIComponent(this.state.location.trim());
+
+        window.history.pushState(location, 'Title', '/search?location=' + location); // updates the URL
+        this.fetchResults('', location);
+    }
+
+    toggleGoing(index) {
+        const places = this.state.places;
+        places[index].userIsGoing = !places[index].userIsGoing;
+        places[index].goingCount += places[index].userIsGoing ? 1 : -1;
+
+        // update state
+        this.setState({
+            places
+        });
+    }
+
+    // Helper methods
     //**********************************
 
     // Fetch the results from cache (if available) or network

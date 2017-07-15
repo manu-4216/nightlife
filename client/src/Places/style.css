@@ -29,7 +29,7 @@
 }
 
 .Places-info-right {
-    font-size: 90%;
+    font-size: 80%;
     color: black;
     padding: 0.5em 0.8em;
     text-align: left;
@@ -68,8 +68,22 @@
     padding-left: 0.6em;
 }
 
+.Places-phone-symbol {
+    color: black;
+}
+
+.Places-address {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.Places-location {
+    vertical-align: sub;
+}
+
 .Places-categories {
-    line-height: 1.5em;
+    line-height: 1.7em;
     margin-top: 0.2em;
     margin-bottom: 1em;
     font-size: 80%;
@@ -81,6 +95,7 @@
     color: #e6dfcf;
     margin-right: 0.5em;
     border-radius: 0.2em;
+    white-space: nowrap; /* prevents word-break */
 }
 
 
@@ -121,11 +136,22 @@
 .Places-stamp {
     position: absolute;
     right: -0.5em;
-    top: 0.5em;
-    height: 9em;
-    width: 10em;
+    bottom: 0em;
+    height: 5em;
+    width: 5.5em;
     transform: rotateZ(-10deg);
 }
+
+@media screen and (min-width: 32em) {
+    .Places-stamp {
+        bottom: auto;
+        right: -0.5em;
+        top: 1.5em;
+        height: 9em;
+        width: 10em;
+    }
+}
+
 
 /* ANIMATION */
 .anim-enter {
