@@ -33,13 +33,26 @@ class Content extends Component {
         this.fetchResults('', location);
     }
 
+    toggleGoing(index) {
+        console.log(this.state.places[index].name);
+
+        const places = this.state.places;
+        places[index].userIsGoing = !places[index].userIsGoing;
+        places[index].goingCount += places[index].userIsGoing ? 1 : -1;
+
+        // update state
+        this.setState({
+            places
+        });
+    }
+
     componentDidMount() {
         // Detect direct link to a search query. Need to populate with the previous cached results (if any)
         const query = window.location.search,
             location = window.location.search.replace("?location=", "");
 
         this.searchInput.focus();
-        
+
         if (query && location) {
             this.fetchResults(query, location);
         }
@@ -73,14 +86,16 @@ class Content extends Component {
                 { this.state.loading ?
                     <div className="Content-loading">Loading...</div> :
 
-                    <Places places={this.state.places} />
+                    <Places
+                        places={this.state.places}
+                        handleToggleGoing={this.toggleGoing.bind(this)}/>
                 }
 
             </div>
         );
     }
 
-    // Methods for getthings things done
+    // Methods for gettings things done
     //**********************************
 
     // Fetch the results from cache (if available) or network
@@ -112,6 +127,12 @@ class Content extends Component {
 
         axios.get(url)
         .then(response => {
+            // Add the votes artificially (for now)
+            response.data.forEach((place, index) => {
+                place.goingCount = index;
+                place.userIsGoing = (index % 2) === 0;
+            })
+
             this.setState({
                 places: response.data,
                 errorMessage: '',

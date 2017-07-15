@@ -12,13 +12,20 @@
     border-radius: 3px;
 }
 
-
 .Places-image {
-    width: 10em;
-    height: 10em;
+    width: 9em;
+    min-width: 9em;
+    height: 9.3em;
     background: #201f1f;
     box-shadow: 2px 0 5px 0 rgba(0, 0, 0, 0.71);
     object-fit: cover;
+}
+
+.Places-info-right-container {
+    padding: 0;
+    position: relative; /* anchor for the stamp img */
+    width: 100%;
+    overflow: hidden;
 }
 
 .Places-info-right {
@@ -38,7 +45,7 @@
 }
 
 .Places-info-right a:hover {
-    color: #FF9800;
+    color: #c51551;
 }
 
 .Places-rating {
@@ -63,13 +70,82 @@
 
 .Places-categories {
     line-height: 1.5em;
+    margin-top: 0.2em;
     margin-bottom: 1em;
     font-size: 80%;
 }
 
 .Places-categories span span {
     padding: 0.1em 0.7em;
-    background: #ffcd3b;
+    background: #c51551;
+    color: #e6dfcf;
     margin-right: 0.5em;
     border-radius: 0.2em;
+}
+
+
+.Places-actions {
+    margin-top: 0.8em;
+    margin-left: 0.35em;
+}
+
+.Places-action-go {
+    padding: 0.2em;
+    width: 1em;
+    line-height: 0.5em;
+    height: 1em;
+    margin-left: 0.5em;
+    border-radius: 15%;
+    font-size: 120%;
+    outline: none;
+    cursor: pointer;
+    vertical-align: middle;
+    color: white;
+    border: 1px solid #4e4d5f;
+    box-sizing: content-box;
+}
+
+.Places-action-go.activate {
+    background: #87a8da;
+}
+.Places-action-go.activate:hover {
+    background: #65779f;
+}
+.Places-action-go.deactivate {
+    background: #c51551;
+}
+.Places-action-go.deactivate:hover {
+    background: #a41143;
+}
+
+.Places-stamp {
+    position: absolute;
+    right: -0.5em;
+    top: 0.5em;
+    height: 9em;
+    width: 10em;
+    transform: rotateZ(-10deg);
+}
+
+/* ANIMATION */
+.anim-enter {
+  opacity: 0.01;
+  transform: scale(2);
+}
+
+.anim-enter.anim-enter-active {
+  opacity: 1;
+  transition: 250ms ease-in;
+  transform: scale(1) rotateZ(-10deg);
+}
+
+.anim-leave {
+    opacity: 1;
+    transform: scale(1) rotateZ(-10deg);
+}
+
+.anim-leave.anim-leave-active {
+  opacity: 0.01;
+  transition: 300ms ease-in;
+  transform: scale(2);
 }
