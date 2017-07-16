@@ -1,99 +1,53 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
-const yelp = require('yelp-fusion')
-const cachedToken = {
-    value: '',
-    expirationDate: 0
-}
-
+const mongoose = require('mongoose')
+const passport = require('passport')
+const flash    = require('connect-flash')
 const bodyParser = require('body-parser')
+const morgan       = require('morgan')
+const cookieParser = require('cookie-parser')
+const session      = require('express-session')
 
-app.set("port", process.env.PORT || 3001)
+// configuration ===============================================================
+mongoose.connect(process.env.MONGO_URL) // connect to our database
 
 
+// require('./config/passport')(passport); // pass passport for configuration
+
+
+// set up our express application
+app.use(morgan('dev')) // log every request to the console
+app.use(cookieParser()) // read cookies (needed for auth)
 app.use(bodyParser.urlencoded({
     extended: true
-}));
-app.use(bodyParser.json());
+}))
+app.use(bodyParser.json()) // get information from html forms
 
+app.set('view engine', 'ejs') // set up ejs for templating
+app.set("port", process.env.PORT || 3001)
+
+// required for passport
+app.use(session({
+    secret: 'singularityscoming',
+    proxy: true,
+    resave: true,
+    saveUninitialized: true
+})) // session secret
+app.use(passport.initialize())
+app.use(passport.session()) // persistent login sessions
+app.use(flash()) // use connect-flash for flash messages stored in session
 
 // Express only serves static assets in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"))
 }
 
-/**
- * Caches the token, to speed up the next YELP API calls
- */
-function getToken() {
-    if (cachedToken.value && cachedToken.expirationDate && Date.now()/1000 < cachedToken.expirationDate) {
-        return Promise.resolve(cachedToken.value)
-    } else {
-        // Get new token:
-        return yelp.accessToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
-        .then(response => {
-            cachedToken.value = response.jsonBody.access_token
-            cachedToken.expirationDate = Date.now() + response.jsonBody.expires_in
-            return Promise.resolve(cachedToken.value)
-        })
-        .catch(error => {
-            return Promise.reject(error)
-        })
-    }
-}
+// routes ======================================================================
+require('./app/routes.js')(app, passport) // load our routes and pass in our app and fully configured passport
 
-// Make server call to YELP API to get the 'nightlife' places around a place
-app.get('/search', function (req, res) {
-    var location = decodeURIComponent(req.query.location).toLowerCase()
 
-    getToken()
-    .then(token => {
-        return yelp.client(token).search({
-            location: location,
-            //categories: 'nightlife'
-            categories: 'bars'
-        })
-    })
-    .then(response => {
-        let usefulData = response.jsonBody.businesses.map(place => {
-
-            return {
-                id: place.id,
-                name: place.name,
-                rating: place.rating,
-                image_url: place.image_url,
-                url: place.url,
-                categories: place.categories,
-                address: place.location.address1,
-                city: place.location.city,
-                display_phone: place.display_phone
-            }
-        });
-
-        //console.log('Sample data: ', usefulData[0])
-        res.json(usefulData)
-
-    })
-    .catch(function (error) {
-        var errorMessage;
-
-        console.log(error)
-        try {
-            errorMessage = JSON.parse(error.response.body).error.description
-        } catch (e) {
-            errorMessage = 'Error while fetching Yelp places.'
-        }
-
-        res.status(400).send(errorMessage)
-    });
-
-})
-
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
-
+// launch ======================================================================
 app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`)
 })
