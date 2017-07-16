@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const path = require('path')
 require('dotenv').config()
 const mongoose = require('mongoose')
 const passport = require('passport')
@@ -25,12 +26,11 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json()) // get information from html forms
 
 app.set('view engine', 'ejs') // set up ejs for templating
-app.set("port", process.env.PORT || 3001)
+app.set("port", process.env.PORT || 3000)
 
 // required for passport
 app.use(session({
     secret: 'singularityscoming',
-    proxy: true,
     resave: true,
     saveUninitialized: true
 })) // session secret
@@ -40,14 +40,17 @@ app.use(flash()) // use connect-flash for flash messages stored in session
 
 // Express only serves static assets in production
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"))
+    app.use(express.static(path.join(__dirname, "client/build")))
 }
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/build/index.html'));
+});
 
 // routes ======================================================================
 require('./app/routes.js')(app, passport) // load our routes and pass in our app and fully configured passport
 
-
 // launch ======================================================================
 app.listen(app.get("port"), () => {
-  console.log(`Find the server at: http://localhost:${app.get("port")}/`)
+    console.log(`Find the server at: http://localhost:${app.get("port")}/`)
 })
