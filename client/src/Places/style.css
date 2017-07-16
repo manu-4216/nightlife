@@ -10,12 +10,14 @@
     display: flex;
     background: #dedede;
     border-radius: 3px;
+    height: 9em;
+    overflow: hidden;
 }
 
 .Places-image {
     width: 9em;
     min-width: 9em;
-    height: 9.3em;
+    height: 9em;
     background: #201f1f;
     box-shadow: 2px 0 5px 0 rgba(0, 0, 0, 0.71);
     object-fit: cover;
@@ -31,7 +33,7 @@
 .Places-info-right {
     font-size: 80%;
     color: black;
-    padding: 0.5em 0.8em;
+    padding: 0.6em 0.3em 0.7em 0.8em;
     text-align: left;
 }
 
@@ -62,6 +64,7 @@
 .Places-title {
     padding: 0;
     font-size: 130%;
+    line-height: 1em;
 }
 
 .Places-phone a, .Places-address a {
@@ -100,8 +103,9 @@
 
 
 .Places-actions {
-    margin-top: 0.8em;
     margin-left: 0.35em;
+    position: absolute;
+    bottom: 0.5em;
 }
 
 .Places-action-go {
@@ -146,7 +150,7 @@
     .Places-stamp {
         bottom: auto;
         right: -0.5em;
-        top: 1.5em;
+        top: 1.3em;
         height: 9em;
         width: 10em;
     }

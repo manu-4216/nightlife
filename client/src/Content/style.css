@@ -5,7 +5,7 @@
 }
 
 .Content-intro {
-    font-size: 110%;
+    font-size: 95%;
     margin: 1em auto;
     padding: 0 1em;
 }
@@ -34,7 +34,6 @@
     background: #ffcd3b;
     border-radius: 0 5px 5px 0;
     border-left: 1px solid black;
-    margin-top: calc(1em - 1px); /* this might get used on small screens */
     margin-right: 0.5em;
 }
 
