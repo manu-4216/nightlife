@@ -1,3 +1,6 @@
+const express = require('express')
+const path = require('path')
+
 const cachedToken = {
     value: '',
     expirationDate: 0
@@ -6,8 +9,82 @@ const yelp = require('yelp-fusion')
 
 module.exports = function(app, passport) {
 
+
+
+    //*******************************
+    // Authentification endpoints  **
+    //*******************************
+    app.get('/login', function (req, res) {
+        console.log('  >>> LOGIN')
+        res.render('app/views/login.ejs', { message: req.flash('loginMessage') })
+    })
+    app.get('/login', function (req, res) {
+        console.log('  >>> LOGIN redirect', req.params)
+
+        res.render('app/views/login.ejs', { message: req.flash('loginMessage') })
+    })
+    // process the login form
+    /*
+    app.post('/login', passport.authenticate('local-login', {
+        successRedirect : '/', // redirect to the secure profile section
+        failureRedirect : '/login', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }))
+    */
+
+    app.post('/login', function(req, res, next) {
+        passport.authenticate('local-login', function(err, user, info) {
+            if (err) {
+                return next(err)
+            }
+            // Redirect if it fails
+            if (!user) {
+                return res.redirect('/login')
+            }
+            req.logIn(user, function(err) {
+                if (err) {
+                    return next(err)
+                }
+                // Redirect if it succeeds
+                var redirectTo = req.session.redirectTo ? req.session.redirectTo : '/'
+                delete req.session.redirectTo
+                return res.redirect(redirectTo)
+            });
+        })(req, res, next);
+    });
+
+
+    app.get('/signup', function (req, res) {
+        console.log(' >>> SIGNUP')
+        res.render('app/views/signup.ejs', { message: req.flash('signupMessage') })
+    })
+    // process the signup form
+    app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect : '/', // redirect to the secure profile section
+        failureRedirect : '/signup', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }))
+
+
+    app.get('/logout', function (req, res) {
+        console.log(' >>> LOGOUT')
+        req.logout() // provided by passport
+        req.redirect('/')
+    })
+
+    app.get('/gotoggle*', function (req, res) {
+        console.log(' >>> gotoggle')
+        if (req.isAuthenticated()) {
+            res.send({ auth: true})
+        } else {
+            req.session.redirectTo = '/search?location=' + req.query.location;
+            res.send({ auth: false })
+        }
+    })
+
     // Make server call to YELP API to get the 'nightlife' places around a place
-    app.get('/search', function (req, res) {
+    app.get('/api/search', function (req, res) {
+        console.log(' >>> api search')
         var location = decodeURIComponent(req.query.location).toLowerCase()
 
         getToken()
@@ -52,8 +129,28 @@ module.exports = function(app, passport) {
         });
     })
 
+
+    // Main home Route
+    app.get('/*', (req, res) => {
+        console.log(' >>> HOME')
+        res.sendFile(path.join(__dirname, '../client/build/index.html'))
+    })
+
+
 }
 
+
+/**
+ * Route middleware to check if user is loggedin
+ */
+function isLoggedIn (req, res, next) {
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated()) {
+        return next()
+    }
+    // if they aren't redirect them to the home page
+    res.redirect('/')
+}
 
 /**
  * Get once the Yelp access token, then caches it in memory, to speed up the next API calls

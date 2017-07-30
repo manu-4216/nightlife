@@ -81,7 +81,7 @@ class Content extends Component {
         event.preventDefault();
         const location = encodeURIComponent(this.state.location.trim());
 
-        window.history.pushState(location, 'Title', '/search?location=' + location); // updates the URL
+        window.history.pushState(location, '', '/search?location=' + location); // updates the URL
         this.fetchResults('', location);
     }
 
@@ -94,6 +94,16 @@ class Content extends Component {
         this.setState({
             places
         });
+
+        axios.get('/gotoggle' + window.location.search).then((data) => {
+            console.log('get go toggle', data)
+            if (!data.data.auth) {
+                window.history.pushState('login', '', '/login' + window.location.search);
+                window.location.reload();
+            }
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     // Helper methods
@@ -120,7 +130,7 @@ class Content extends Component {
     // Gets the results from the server
     // Used 1) after a form submition or 2) by direct URL access with a query in the URL
     fetchResultsFromNetwork(location) {
-        const url = '/search?location=' + location;
+        const url = '/api/search?location=' + location;
 
         this.setState({
             loading: true
