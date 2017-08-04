@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+const Users = require('./models/user');
 
 const cachedToken = {
     value: '',
@@ -75,7 +76,30 @@ module.exports = function(app, passport) {
     app.get('/gotoggle*', function (req, res) {
         console.log(' >>> gotoggle')
         if (req.isAuthenticated()) {
-            res.send({ auth: true})
+            // console.log('user all:', req.user);
+            // console.log('placeid:', req.query.placeid);
+
+            Users.findById(req.user._id)
+            .then((user) => {
+                var positionFound = user.going.indexOf(req.query.placeid);
+
+                if (positionFound === -1) {
+                    user.going.push(req.query.placeid); // add the element
+                } else {
+                    user.going.splice(positionFound, 1); // remove the element
+                }
+
+                user.save(function(err) {
+                    if (err) { console.log('err', err); }
+                });
+
+                res.send({ auth: true, going:  positionFound === -1 })
+            })
+            .catch(err => {
+                console.log(err);
+                res.send({ auth: false })
+            })
+
         } else {
             req.session.redirectTo = '/search?location=' + req.query.location;
             res.send({ auth: false })
@@ -86,6 +110,8 @@ module.exports = function(app, passport) {
     app.get('/api/search', function (req, res) {
         console.log(' >>> api search')
         var location = decodeURIComponent(req.query.location).toLowerCase()
+
+        console.log('req.user', req.user);
 
         getToken()
         .then(token => {

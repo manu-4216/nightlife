@@ -86,17 +86,18 @@ class Content extends Component {
     }
 
     toggleGoing(index) {
-        const places = this.state.places;
-        places[index].userIsGoing = !places[index].userIsGoing;
-        places[index].goingCount += places[index].userIsGoing ? 1 : -1;
+        // TODO: move this in ok cb
+        const place = this.state.places[index];
+        place.userIsGoing = !place.userIsGoing;
+        place.goingCount += place.userIsGoing ? 1 : -1;
 
+        console.log('place-id', place.id);
         // update state
         this.setState({
-            places
+            places: this.state.places
         });
 
-        axios.get('/gotoggle' + window.location.search).then((data) => {
-            console.log('get go toggle', data)
+        axios.get('/gotoggle' + window.location.search + '&placeid=' + place.id).then((data) => {
             if (!data.data.auth) {
                 window.history.pushState('login', '', '/login' + window.location.search);
                 window.location.reload();
