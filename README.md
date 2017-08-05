@@ -10,3 +10,7 @@ Objective: Build a full stack JavaScript app - Nightlife Coordination App
   4. As an unauthenticated user, when I login I should not have to search again
 
   Part of: FCC projects ([here](https://www.freecodecamp.com/challenges/build-a-nightlife-coordination-app))
+
+Screenshots:
+
+![alt text](https://s1.postimg.org/galio71nz/nightlife.png)
