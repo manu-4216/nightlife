@@ -12,6 +12,10 @@ const session      = require('express-session')
 
 // configuration ===============================================================
 mongoose.connect(process.env.MONGO_URL) // connect to our database
+.then()
+.catch(err => {
+    console.log('DB connection error: ', err)
+})
 
 
 require('./app/config/passport')(passport); // pass passport for configuration
@@ -24,13 +28,6 @@ app.use(bodyParser.json()) // get information from html forms
 app.use(bodyParser.urlencoded({
     extended: true
 }))
-
-
-// Express only serves static assets in production
-//if (process.env.NODE_ENV === "production") {
-    //app.use(express.static(path.join(__dirname, "client/build")))
-    //app.use(express.static("client/build"))
-//}
 
 app.set('views', __dirname + '/')
 app.set('view engine', 'ejs') // set up ejs for templating

@@ -88,19 +88,21 @@ class Content extends Component {
     toggleGoing(index) {
         // TODO: move this in ok cb
         const place = this.state.places[index];
-        place.userIsGoing = !place.userIsGoing;
-        place.goingCount += place.userIsGoing ? 1 : -1;
+        var that = this;
 
-        console.log('place-id', place.id);
-        // update state
-        this.setState({
-            places: this.state.places
-        });
-
-        axios.get('/gotoggle' + window.location.search + '&placeid=' + place.id).then((data) => {
+        axios.get('/api/gotoggle' + window.location.search + '&placeid=' + place.id).then((data) => {
             if (!data.data.auth) {
                 window.history.pushState('login', '', '/login' + window.location.search);
                 window.location.reload();
+            } else {
+                // Auth, so update
+                place.userIsGoing = !place.userIsGoing;
+                place.goingCount += place.userIsGoing ? 1 : -1;
+
+                // update state
+                that.setState({
+                    places: this.state.places
+                });
             }
         }).catch(error => {
             console.log(error)
@@ -114,7 +116,7 @@ class Content extends Component {
     fetchResults(query, location) {
         let queryResult = '';
 
-        queryResult = store.get(location);
+        // queryResult = store.get(location); // TEMPORARY dont use the cache
         if (queryResult) {
             this.setState({
                 places: queryResult,
@@ -141,8 +143,8 @@ class Content extends Component {
         .then(response => {
             // Add the votes artificially (for now)
             response.data.forEach((place, index) => {
-                place.goingCount = index;
-                place.userIsGoing = (index % 2) === 0;
+                place.goingCount = place.usersCount;
+                place.userIsGoing = place.userIsGoing; // for now
             })
 
             this.setState({

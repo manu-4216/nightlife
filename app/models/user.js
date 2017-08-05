@@ -8,7 +8,8 @@ var userSchema = mongoose.Schema({
         password     : String,
     },
 
-    going: {
+    // List of places where the user is going
+    places: {
         type: [String],
         default: []
     }

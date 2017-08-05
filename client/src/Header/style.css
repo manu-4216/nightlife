@@ -1,0 +1,28 @@
+.Header {
+    color: white;
+    background: #270f13;
+    background: linear-gradient(0deg, rgba(148, 0, 50, 0.16), rgba(148, 0, 50, 1));
+    text-align: left;
+    box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.71);
+}
+
+.Header-logo {
+    height: 3em;
+    width: 2.7em;
+    vertical-align: middle;
+    margin: 0 0.5em;
+}
+
+.Header-title {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0.6em 0.5em 0.6em 0;
+    color: #ffc107;
+}
+
+.Header-login {
+    position: absolute;
+    right: 0;
+    margin-right: 1em;
+    line-height: 3.5em;
+}

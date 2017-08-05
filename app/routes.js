@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 const Users = require('./models/user');
+const Places = require('./models/places');
 
 const cachedToken = {
     value: '',
@@ -16,22 +17,14 @@ module.exports = function(app, passport) {
     // Authentification endpoints  **
     //*******************************
     app.get('/login', function (req, res) {
-        console.log('  >>> LOGIN')
+        if (req.query.location) {
+            req.session.redirectTo = '/search?location=' + req.query.location;
+        }
         res.render('app/views/login.ejs', { message: req.flash('loginMessage') })
     })
     app.get('/login', function (req, res) {
-        console.log('  >>> LOGIN redirect', req.params)
-
         res.render('app/views/login.ejs', { message: req.flash('loginMessage') })
     })
-    // process the login form
-    /*
-    app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/', // redirect to the secure profile section
-        failureRedirect : '/login', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
-    }))
-    */
 
     app.post('/login', function(req, res, next) {
         passport.authenticate('local-login', function(err, user, info) {
@@ -56,7 +49,6 @@ module.exports = function(app, passport) {
 
 
     app.get('/signup', function (req, res) {
-        console.log(' >>> SIGNUP')
         res.render('app/views/signup.ejs', { message: req.flash('signupMessage') })
     })
     // process the signup form
@@ -68,32 +60,57 @@ module.exports = function(app, passport) {
 
 
     app.get('/logout', function (req, res) {
-        console.log(' >>> LOGOUT')
         req.logout() // provided by passport
-        req.redirect('/')
+        res.redirect('/')
     })
 
-    app.get('/gotoggle*', function (req, res) {
-        console.log(' >>> gotoggle')
-        if (req.isAuthenticated()) {
-            // console.log('user all:', req.user);
-            // console.log('placeid:', req.query.placeid);
+    app.get('/api/gotoggle*', function (req, res) {
+        const placeId = req.query.placeid;
 
+        if (req.isAuthenticated()) {
             Users.findById(req.user._id)
             .then((user) => {
-                var positionFound = user.going.indexOf(req.query.placeid);
+                var positionInUserPlaces = user.places.indexOf(placeId),
+                    userIsGoing = positionInUserPlaces > -1;
 
-                if (positionFound === -1) {
-                    user.going.push(req.query.placeid); // add the element
+                if (positionInUserPlaces === -1) {
+                    user.places.push(placeId); // add the element
+                    // Places.findOne ...
                 } else {
-                    user.going.splice(positionFound, 1); // remove the element
+                    user.places.splice(positionInUserPlaces, 1); // remove the element
                 }
 
                 user.save(function(err) {
                     if (err) { console.log('err', err); }
                 });
 
-                res.send({ auth: true, going:  positionFound === -1 })
+                //**************************************************
+
+                Places.findOne({ id: placeId })
+                .then((place) => {
+                    if (!place) {
+                        newPlace = new Places();
+                        newPlace.id = placeId;
+                        newPlace.usersCount = 1;
+                        newPlace.save(function(err) {
+                            if (err) { console.log('err', err); }
+                        });
+                    } else {
+                        if (!userIsGoing) {
+                            place.usersCount += 1;
+                        } else {
+                            place.usersCount -= 1;
+                        }
+                        place.save(function(err) {
+                            if (err) { console.log('err', err); }
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                //********************************************************
+                res.send({ auth: true })
             })
             .catch(err => {
                 console.log(err);
@@ -108,21 +125,18 @@ module.exports = function(app, passport) {
 
     // Make server call to YELP API to get the 'nightlife' places around a place
     app.get('/api/search', function (req, res) {
-        console.log(' >>> api search')
-        var location = decodeURIComponent(req.query.location).toLowerCase()
-
-        console.log('req.user', req.user);
+        var location = decodeURIComponent(req.query.location).toLowerCase();
+        var completePlacesData = [];
 
         getToken()
         .then(token => {
             return yelp.client(token).search({
                 location: location,
-                //categories: 'nightlife'
                 categories: 'bars'
             })
         })
         .then(response => {
-            let usefulData = response.jsonBody.businesses.map(place => {
+            completePlacesData = response.jsonBody.businesses.map(place => {
 
                 return {
                     id: place.id,
@@ -133,18 +147,32 @@ module.exports = function(app, passport) {
                     categories: place.categories,
                     address: place.location.address1,
                     city: place.location.city,
-                    display_phone: place.display_phone
+                    display_phone: place.display_phone,
+                    userIsGoing: req.user ? (req.user.places.indexOf(place.id) > -1) : 0
                 }
             });
 
-            //console.log('Sample data: ', usefulData[0])
-            res.json(usefulData)
+            return completePlacesData;
+        })
+        .then(placesData => {
+            const placesId = placesData.map(place => place.id);
 
+            return getUsersCountList(placesId);
+        })
+        // Add 'usersCount' property for each place
+        .then(usersCountList => {
+            usersCountList.forEach((usersCount, index) => {
+                completePlacesData[index].usersCount = usersCount;
+            })
+
+            // console.log('completePlacesData', completePlacesData[0]);
+            res.json(completePlacesData)
         })
         .catch(function (error) {
             var errorMessage;
 
             console.log(error)
+
             try {
                 errorMessage = JSON.parse(error.response.body).error.description
             } catch (e) {
@@ -155,13 +183,15 @@ module.exports = function(app, passport) {
         });
     })
 
+    app.get('/api/isloggedin', (req, res) => {
+        res.send({ auth: req.isAuthenticated()})
+    })
+
 
     // Main home Route
     app.get('/*', (req, res) => {
-        console.log(' >>> HOME')
         res.sendFile(path.join(__dirname, '../client/build/index.html'))
     })
-
 
 }
 
@@ -181,7 +211,7 @@ function isLoggedIn (req, res, next) {
 /**
  * Get once the Yelp access token, then caches it in memory, to speed up the next API calls
  */
-function getToken() {
+function getToken () {
     if (cachedToken.value && cachedToken.expirationDate && Date.now()/1000 < cachedToken.expirationDate) {
         return Promise.resolve(cachedToken.value)
     } else {
@@ -196,4 +226,27 @@ function getToken() {
             return Promise.reject(error)
         })
     }
+}
+
+
+function getUsersCountList (placesId) {
+    var getUsersCountListPromises = placesId.map((placeId, index) => {
+        return new Promise((resolve, reject) => {
+            // do db access with placeId
+            Places.findOne({ id: placeId })
+            .then((place) => {
+                if (!place) {
+                    place.usersCount = 0;
+                    resolve(0);
+                }
+
+                resolve(place.usersCount)
+            })
+            .catch(err => {
+                resolve(0);
+            })
+
+        })
+    })
+    return Promise.all(getUsersCountListPromises)
 }
