@@ -13,11 +13,11 @@ Objective: Build a full stack JavaScript app - Nightlife Coordination App
 
 Screenshots:
 
-**Logged in:**
+**Not Logged in:**
 
 ![not logged in](https://github.com/manu-4216/resources/blob/master/nightlife_1.JPG)
 
 
-**Not logged in:**
+**Logged in:**
 
 ![not logged in](https://github.com/manu-4216/resources/blob/master/nightlife_2.JPG)
